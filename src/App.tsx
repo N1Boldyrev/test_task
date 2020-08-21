@@ -81,21 +81,20 @@ const App: React.FC = () => {
 
     const validation = () => {
         let valid: boolean = true;
+        console.log("valid");
         const numReg: RegExp = new RegExp(/^\d{1,}$/); // Проверка на число
         const nameReg: RegExp = new RegExp(/^[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?$/);
         if (numReg.test(state.routeName) || state.routeName === "") {
             valid = false;
             setState((state) => ({ ...state, routeNameClass: "error" }));
-        }
+        } else setState((state) => ({ ...state, routeNameClass: "" }));
         if (!nameReg.test(state.routeAuthor) || state.routeAuthor === "") {
             valid = false;
             setState((state) => ({ ...state, routeAuthorClass: "error" }));
-        }
+        } else setState((state) => ({ ...state, routeAuthorClass: "" }));
         if (valid)
             setState((state) => ({
                 ...state,
-                routeNameClass: "",
-                routeAuthorClass: "",
                 buttonDisabled: false,
                 wasValidated: true,
             }));
