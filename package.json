@@ -1,0 +1,25 @@
+{
+    "name": "test_task",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/N1Boldyrev/test_task.git",
+    "author": "N1Boldyrev <n1boldyrev@yandex.ru>",
+    "license": "MIT",
+    "scripts": {
+        "dev": "webpack --mode development --watch"
+    },
+    "dependencies": {
+        "@types/react": "^16.9.46",
+        "@types/react-dom": "^16.9.8",
+        "css-loader": "^4.2.1",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
+        "sass": "^1.26.10",
+        "sass-loader": "^9.0.3",
+        "style-loader": "^1.2.1",
+        "ts-loader": "^8.0.2",
+        "typescript": "^3.9.7",
+        "webpack": "^4.44.1",
+        "webpack-cli": "^3.3.12"
+    }
+}
