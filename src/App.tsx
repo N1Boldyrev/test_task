@@ -6,137 +6,146 @@ import Select from "./components/Select";
 const spaceReg: RegExp = new RegExp(/^[ s]+|[ s]+$/g); // Пробелы в начале и конце строки
 
 const App: React.FC = () => {
-    const [routeName, setRouteName] = useState<string>(""); //Стейт для первого инпута
-    const [routeAuthor, setRouteAuthor] = useState<string>(""); //Стейт для второго инпута
-    const [routeNameClass, setRouteNameClass] = useState<string>("");
-    const [routeAuthorClass, setRouteAuthorClass] = useState<string>("");
-
-    const [selectState, setSelectState] = useState<string>("Механик");
-    const [checkboxState, setCheckboxState] = useState<boolean>(false);
-    const [supState, setSupState] = useState<string>("");
-    const [radioState, setRadioState] = useState<string>("Пн");
-    const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
-    const [localStorageLoaded, setLocalStorageLoaded] = useState<boolean>(false);
+    const [state, setState] = useState({
+        routeName: "",
+        routeAuthor: "",
+        routeNameClass: "",
+        routeAuthorClass: "",
+        selectState: "Механик",
+        checkboxState: false,
+        supState: "",
+        radioState: "Пн",
+        buttonDisabled: false,
+        localStorageLoaded: false,
+        wasValidated: false,
+    });
 
     useEffect(() => {
-        if (checkboxState == true) validation();
-        if (!localStorageLoaded) {
+        if (!state.localStorageLoaded) {
+            setState((state) => ({ ...state, localStorageLoaded: true }));
             const data: string | null = localStorage.getItem("data");
             if (data != null) {
                 const pharse = JSON.parse(data);
-                setRouteName(pharse.routeName);
-                setRouteAuthor(pharse.routeAuthor);
-                setSelectState(pharse.selectState);
-                setCheckboxState(pharse.checkboxState);
-                setRadioState(pharse.radioState);
-                setSupState(pharse.supState);
-                setButtonDisabled(pharse.buttonDisabled);
+                setState((state) => ({
+                    ...state,
+                    routeName: pharse.routeName,
+                    routeAuthor: pharse.routeAuthor,
+                    selectState: pharse.selectState,
+                    checkboxState: pharse.checkboxState,
+                    radioState: pharse.radioState,
+                    supState: pharse.supState,
+                    buttonDisabled: pharse.buttonDisabled,
+                }));
             }
-            setLocalStorageLoaded(true);
         }
+        if (state.checkboxState && !state.wasValidated) validation();
     });
 
     const routeNameHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = event.target.value;
+        let value: string = event.target.value;
         value.replace(spaceReg, "");
-        setRouteName(value);
+        setState((state) => ({ ...state, routeName: value, wasValidated: false }));
     };
 
     const routeAuthorHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let value = event.target.value;
+        let value: string = event.target.value;
         value.replace(spaceReg, "");
-        setRouteAuthor(value);
+        setState((state) => ({ ...state, routeAuthor: value, wasValidated: false }));
     };
 
     const selectHandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectState(event.target.value);
+        const eventTargetValue: string = event.target.value;
+        setState((state) => ({ ...state, selectState: eventTargetValue }));
     };
 
     const checkboxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let checked = event.target.checked;
-        setCheckboxState(checked);
+        let checked: boolean = event.target.checked;
         if (checked) {
-            setSupState("*");
+            setState((state) => ({ ...state, checkboxState: checked, supState: "*", wasValidated: false }));
         } else {
-            setSupState("");
-            setButtonDisabled(false);
-            setRouteNameClass("");
-            setRouteAuthorClass("");
+            setState((state) => ({
+                ...state,
+                checkboxState: checked,
+                supState: "",
+                buttonDisabled: false,
+                routeNameClass: "",
+                routeAuthorClass: "",
+            }));
         }
     };
 
     const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRadioState(event.target.value);
+        const eventTargetValue: string = event.target.value;
+        setState((state) => ({ ...state, radioState: eventTargetValue }));
     };
 
     const validation = () => {
         let valid: boolean = true;
         const numReg: RegExp = new RegExp(/^\d{1,}$/); // Проверка на число
         const nameReg: RegExp = new RegExp(/^[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?$/);
-        if (numReg.test(routeName) || numReg.test(routeAuthor) || routeAuthor == "") {
+        if (numReg.test(state.routeName) || state.routeName === "") {
             valid = false;
-            setRouteNameClass("error");
-            setButtonDisabled(true);
-        } else {
-            setRouteNameClass("");
-            setButtonDisabled(false);
+            setState((state) => ({ ...state, routeNameClass: "error" }));
         }
-        if (nameReg.test(routeAuthor) == false || routeAuthor == "") {
+        if (!nameReg.test(state.routeAuthor) || state.routeAuthor === "") {
             valid = false;
-            setRouteAuthorClass("error");
-            setButtonDisabled(true);
-        } else {
-            setRouteAuthorClass("");
-            setButtonDisabled(false);
+            setState((state) => ({ ...state, routeAuthorClass: "error" }));
         }
+        if (valid)
+            setState((state) => ({
+                ...state,
+                routeNameClass: "",
+                routeAuthorClass: "",
+                buttonDisabled: false,
+                wasValidated: true,
+            }));
+        else setState((state) => ({ ...state, buttonDisabled: true, wasValidated: true }));
         return valid;
     };
 
     const sendData = (event: React.FormEvent) => {
         event.preventDefault();
-        const sendingObject: object = {
-            routeName: routeName,
-            routeAuthor: routeAuthor,
-            selectState: selectState,
-            checkboxState: checkboxState,
-            radioState: radioState,
-            supState: supState,
-            buttonDisabled: buttonDisabled,
-        };
-        localStorage.setItem("data", JSON.stringify(sendingObject));
+        localStorage.setItem("data", JSON.stringify(state));
     };
 
     return (
         <form onSubmit={sendData}>
-            <Input
-                label="Наименование"
-                value={routeName}
-                handler={routeNameHandler}
-                sup={supState}
-                className={routeNameClass}
-            />
-            <Input
-                label="Автор маршрута"
-                value={routeAuthor}
-                handler={routeAuthorHandler}
-                sup={supState}
-                className={routeAuthorClass}
-            />
-            <Select selectState={selectState} selectHandler={selectHandler} />
-            <span>
-                Дни обходов
-                <Radio value="Пн" radioState={radioState} handler={radioHandler} />
-                <Radio value="Вт" radioState={radioState} handler={radioHandler} />
-                <Radio value="Ср" radioState={radioState} handler={radioHandler} />
-                <Radio value="Чт" radioState={radioState} handler={radioHandler} />
-                <Radio value="Пт" radioState={radioState} handler={radioHandler} />
-                <Radio value="Сб" radioState={radioState} handler={radioHandler} />
-                <Radio value="Вс" radioState={radioState} handler={radioHandler} />
+            <p>Информация о маршруте</p>
+            <div className="fields">
+                <Input
+                    label="Наименование"
+                    value={state.routeName}
+                    sup={state.supState}
+                    className={state.routeNameClass}
+                    handler={routeNameHandler}
+                />
+                <Input
+                    label="Автор маршрута"
+                    value={state.routeAuthor}
+                    sup={state.supState}
+                    className={state.routeAuthorClass}
+                    handler={routeAuthorHandler}
+                />
+                <Select selectState={state.selectState} selectHandler={selectHandler} sup={state.supState} />
+            </div>
+            <div className="form-footer">
+                <div>
+                    Дни обходов <sup>{state.supState}</sup>
+                </div>
+                <div className="radio">
+                    <Radio value="Пн" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Вт" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Ср" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Чт" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Пт" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Сб" radioState={state.radioState} handler={radioHandler} />
+                    <Radio value="Вс" radioState={state.radioState} handler={radioHandler} />
+                </div>
                 <label>
-                    <input type="checkbox" checked={checkboxState} onChange={checkboxHandler} /> Длительный обход
+                    <input type="checkbox" checked={state.checkboxState} onChange={checkboxHandler} /> Длительный обход
                 </label>
-            </span>
-            <button type="submit" disabled={buttonDisabled}>
+            </div>
+            <button type="submit" disabled={state.buttonDisabled}>
                 Сохранить
             </button>
         </form>

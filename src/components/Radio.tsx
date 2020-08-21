@@ -8,16 +8,17 @@ interface radioProps {
 
 const Radio: React.FC<radioProps> = (props) => {
     return (
-        <label>
+        <>
             <input
                 type="radio"
                 name="days"
+                id={props.value}
                 value={props.value}
                 onChange={props.handler}
                 checked={props.radioState === props.value}
             />
-            {props.value}
-        </label>
+            <label htmlFor={props.value}>{props.value}</label>
+        </>
     );
 };
 

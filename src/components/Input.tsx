@@ -10,11 +10,15 @@ interface InputProps {
 
 const Input: React.FC<InputProps> = (props) => {
     return (
-        <label>
-            {props.label}
-            <sup>{props.sup}</sup>
-            <input type="text" value={props.value} onChange={props.handler} className={props.className} />
-        </label>
+        <div className="field">
+            <label>
+                <span>
+                    {props.label}
+                    <sup>{props.sup}</sup>
+                </span>
+                <input type="text" value={props.value} onChange={props.handler} className={props.className} />
+            </label>
+        </div>
     );
 };
 
