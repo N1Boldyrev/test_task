@@ -3,7 +3,7 @@ import Input from "./components/Input";
 import Radio from "./components/Radio";
 import Select from "./components/Select";
 
-const spaceReg: RegExp = new RegExp(/^[ s]+|[ s]+$/g); // Пробелы в начале и конце строки
+const spaceReg: RegExp = new RegExp(/^[ ]/g); // Пробелы в начале и конце строки
 
 const App: React.FC = () => {
     const [state, setState] = useState({
@@ -43,13 +43,13 @@ const App: React.FC = () => {
 
     const routeNameHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value: string = event.target.value;
-        value.replace(spaceReg, "");
+        value = value.replace(spaceReg, "");
         setState((state) => ({ ...state, routeName: value, wasValidated: false }));
     };
 
     const routeAuthorHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value: string = event.target.value;
-        value.replace(spaceReg, "");
+        value = value.replace(spaceReg, "");
         setState((state) => ({ ...state, routeAuthor: value, wasValidated: false }));
     };
 
